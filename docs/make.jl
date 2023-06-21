@@ -2,18 +2,20 @@ using Documenter, VizDataFlow
 
 makedocs(;
     pages = [
-        "Home" => "index.md",
-        "Getting started" => "getting_started.md",
-        "Tutorials" => [
+        "Home"             => "index.md",
+        "Getting started"  => "getting_started.md",
+        "Tutorials"        => [
             "Introduction" => "tutorials/index.md",
         ],
-        "API" => "API/index.md",
+        "API"              => "API/index.md",
     ],
     sitename="VizDataFlow.jl",
 )
 
 if get(ENV, "CI", nothing) == "true"
     deploydocs(;
-        repo="github.com/mkg33/VizDataFlow.jl",
+        repo         = "github.com/mkg33/VizDataFlow.jl",
+        push_preview = true,
+        devbranch    = "main",
     )
 end
