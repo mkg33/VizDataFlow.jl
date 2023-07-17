@@ -1,7 +1,6 @@
-using ADIOS2
 
 let
-    global engine, T_id, adios
+    global adios2_init, adios
 
     function adios2_init(filename::AbstractString = "",
                          mpi = true, comm = nothing)
@@ -53,7 +52,7 @@ let
         end_step(engine)
     end
 
-end
+
 
 function adios2_config(; engine = "")
 
@@ -92,6 +91,8 @@ function adios2_config(; engine = "")
     close(adios2_xml)
 
     return xml_path
+
+end
 
 end
 
