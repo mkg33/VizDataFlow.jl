@@ -1,4 +1,6 @@
 
+export adios2_init
+
 let
     global adios2_init, adios
 
@@ -93,8 +95,6 @@ function adios2_config(; engine = "")
     return xml_path
 
 end
-
-export adios2_init
 
 end
 
