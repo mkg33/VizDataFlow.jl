@@ -1,6 +1,8 @@
 
 export adios2_init
 
+using ADIOS2
+
 let
     global adios2_init, adios
 
