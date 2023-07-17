@@ -4,7 +4,7 @@ export adios2_init, write_mode
 using ADIOS2
 
 let
-    global adios2_init, adios, engine
+    global adios2_init, write_mode, adios, engine
 
     function adios2_init(filename::AbstractString = "",
                          mpi = true, comm = nothing)
