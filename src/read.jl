@@ -4,7 +4,7 @@ export adios2_init, write_mode
 using ADIOS2
 
 let
-    global adios2_init, write_mode, adios, engine
+    global adios2_init, write_mode, adios, engine, T_id
 
     function adios2_init(filename::AbstractString = "",
                          mpi = true, comm = nothing)
@@ -56,13 +56,9 @@ let
 
         engine = ADIOS2.open(io, bp_path, mode_write)
 
-        #temp
-
-        return engine
-
     end
 
-    function perform_update()
+    function perform_update(T_nohalo = nothing)
         begin_step(engine)                                       # Begin ADIOS2 write step
         put!(engine, T_id, T_nohalo)                             # Add T (without halo) to variables for writing
         end_step(engine)
