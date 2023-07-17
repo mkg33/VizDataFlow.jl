@@ -94,6 +94,8 @@ function adios2_config(; engine = "")
 
 end
 
+export adios2_init
+
 end
 
 #adios2_init()
