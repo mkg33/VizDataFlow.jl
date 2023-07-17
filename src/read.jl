@@ -1,10 +1,10 @@
 
-export adios2_init
+export adios2_init, write_mode
 
 using ADIOS2
 
 let
-    global adios2_init, adios
+    global adios2_init, adios, engine
 
     function adios2_init(filename::AbstractString = "",
                          mpi = true, comm = nothing)
@@ -46,7 +46,15 @@ let
 
     end
 
-    function write_mode()
+    function write_mode(var_name = "", var_type = nothing)
+
+        io = ADIOS2.declare_io(adios, "IO")
+
+        T_id = define_variable(io, var_name, eltype(var_type))
+
+        bp_path = joinpath(pwd(), "diffusion2D.bp")
+
+        engine = ADIOS2.open(io, bp_path, mode_write)
 
     end
 
