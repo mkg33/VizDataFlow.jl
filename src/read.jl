@@ -56,6 +56,10 @@ let
 
         engine = ADIOS2.open(io, bp_path, mode_write)
 
+        #temp
+
+        return engine
+
     end
 
     function perform_update()
