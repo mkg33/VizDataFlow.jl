@@ -1,17 +1,17 @@
-export adios2_init, write_mode, read_mode, perform_update
+export adios2_init, write_mode, read_mode, perform_update, finalize_adios
 
 using ADIOS2
 
 """
 Sample usage:
 
-adios2_init(joinpath(pwd(),"adios2.xml"), comm) # initialization from XML file, with MPI and an existing comm
-write_mode("temperature", eltype(T)) # define a new variable 'temperature'
+adios2_init(filename = "adios2.xml", comm) # initialization from XML file, with MPI and an existing comm
+write_mode("temperature", eltype(T)) # define a new variable 'temperature' and provide its type
 
 """
 
 let
-    global adios2_init, write_mode, perform_update, adios, engine, T_id
+    global adios2_init, write_mode, read_mode, perform_update, finalize_adios, adios, engine, T_id, init_state
 
     """
     Intialize ADIOS2. Supports several configuration options: MPI, serial,
@@ -37,6 +37,8 @@ let
                 adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
             end
         end
+
+        init_state = true # mark the initialization step
 
     end
 
@@ -67,9 +69,24 @@ let
     Perform the update using specified variables.
     """
     function perform_update(T_nohalo = nothing)
+
         begin_step(engine)                                       # Begin ADIOS2 write step
         put!(engine, T_id, T_nohalo)                             # Add T (without halo) to variables for writing
         end_step(engine)                                         # End ADIOS2 write step (normally, also includes the actual writing of data)
+
+    end
+
+    """
+    Close the ADIOS2 engine once all steps have been performed.
+    """
+    function finalize_adios()
+
+        if init_state == true
+            close(engine)
+        else
+            print("Error. ADIOS2 hasn't been initialized.")
+        end
+
     end
 
     """
