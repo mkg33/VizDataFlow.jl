@@ -17,7 +17,7 @@ let
     Intialize ADIOS2. Supports several configuration options: MPI, serial,
     existing XML config file or a new file with specified parameters.
     """
-    function adios2_init(filename::AbstractString = "", engine = "",
+    function adios2_init(; filename::AbstractString = "", engine = "",
                          mpi = true, serial = false, comm = nothing)
 
         if isempty(filename)
@@ -77,7 +77,7 @@ let
     template to create the file automatically with parameters provided by the
     user. Returns the XML path to the new file.
     """
-    function adios2_config(; engine = "")
+    function adios2_config(engine = "")
 
         template_path = joinpath(pwd(), "adios2_template.xml")
         xml_path = joinpath(pwd(), "adios2_config.xml")
