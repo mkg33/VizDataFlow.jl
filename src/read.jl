@@ -1,37 +1,38 @@
-export adios2_init, write_mode, read_mode, perform_update, finalize_adios
-
-using ADIOS2
+#using ADIOS2
 
 """
 Sample usage:
 
-adios2_init(filename = "adios2.xml", comm) # initialization from XML file, with MPI and an existing comm
-write_mode("temperature", eltype(T)) # define a new variable 'temperature' and provide its type
+adios2_init(filename = "adios2.xml", comm) # initialization from XML file, with
+MPI and an existing comm write_mode("temperature", eltype(T)) # define a new
+variable 'temperature' and provide its type
 
 """
-
-let
-    global adios2_init, write_mode, read_mode, perform_update, finalize_adios, adios, engine, T_id, init_state
+    # assign values
 
     """
     Intialize ADIOS2. Supports several configuration options: MPI, serial,
     existing XML config file or a new file with specified parameters.
     """
-    function adios2_init(; filename::AbstractString = "", engine = "",
-                         mpi = true, serial = false, comm = nothing)
+    function adios2_init(; filename::AbstractString = "", engine_type = "",
+                         serial = false, comm = nothing)
+
+        use_mpi = !isnothing(comm)
 
         if isempty(filename)
-            if serial == true
+            if serial
                 adios = adios_init_serial()
-            elseif mpi == true
-                filename = adios2_config(engine = engine)
+                # some function
+            elseif use_mpi
+                filename = adios2_config(engine = engine_type)
                 adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
-            else
-                filename = adios2_config(engine = engine)
+                # add error
+            else serial_file # third option
+                filename = adios2_config(engine = engine_type)
                 adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
             end
         else
-            if mpi == true
+            if use_mpi
                 adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
             else
                 adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
@@ -56,10 +57,10 @@ let
     """
     Initialize io in write mode and the corresponding engine for writing data.
     """
-    function write_mode(var_name = "", var_type = nothing, bp_filename = "")
+    function write_mode(variable_name = "", variable = nothing, bp_filename = "") # other options
 
         io = ADIOS2.declare_io(adios, "IO")
-        T_id = define_variable(io, var_name, eltype(var_type))  # Define a new variable
+        var = define_variable(io, variable_name, eltype(variable))  # Define a new variable
         bp_path = joinpath(pwd(), bp_filename)
         engine = ADIOS2.open(io, bp_path, mode_write)   # Open the file/stream from the .bp file
 
@@ -68,11 +69,30 @@ let
     """
     Perform the update using specified variables.
     """
-    function perform_update(T_nohalo = nothing)
+    function perform_update(T_nohalo = nothing) # add options
 
         begin_step(engine)                                       # Begin ADIOS2 write step
-        put!(engine, T_id, T_nohalo)                             # Add T (without halo) to variables for writing
+        put!(engine, var, T_nohalo)                              # Add T (without halo) to variables for writing
         end_step(engine)                                         # End ADIOS2 write step (normally, also includes the actual writing of data)
+
+    end
+
+    function perform_read(...; read_function = nothing, verbose = true) # add defaults (allocation etc.) + verbose flag
+
+        nprocessed = 0
+
+        while begin_step(engine, step_mode_read, 100.0) != step_status_end_of_stream
+
+            read_function
+
+            end_step(engine)
+
+            if verbose
+                print("Step: " * string(nprocessed))
+            end
+
+            nprocessed += 1
+        end
 
     end
 
@@ -94,10 +114,10 @@ let
     template to create the file automatically with parameters provided by the
     user. Returns the XML path to the new file.
     """
-    function adios2_config(engine = "")
+    function adios2_config(engine_type = "") # write whole as string
 
         template_path = joinpath(pwd(), "adios2_template.xml")
-        xml_path = joinpath(pwd(), "adios2_config.xml")
+        xml_path = joinpath(pwd(), "adios2_config.xml") # save location
 
         adios2_template = open(template_path, "r")
 
@@ -107,14 +127,14 @@ let
 
         # temp file for replacing modified lines
 
-        if cmp(engine, "SST") == 0
+        if cmp(engine_type, "SST") == 0
             for line in eachline(xml_path, keep = true)
                 if occursin("ENGINE_TYPE", line)
                     line = "<engine type=\"SST\">"
                 end
                 write(adios2_xml, line)
             end
-        elseif cmp(engine, "BP4") == 0
+        elseif cmp(engine_type, "BP4") == 0
             for line in eachline(xml_path, keep = true)
                 if occursin("ENGINE_TYPE", line)
                     line = "<engine type=\"BP4\">"
@@ -131,5 +151,3 @@ let
 
         return xml_path
     end
-
-end

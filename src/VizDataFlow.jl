@@ -4,12 +4,18 @@ Module VizDataFlow
 
 module VizDataFlow
 
-export adios2_init
+export adios2_init, write_mode, read_mode, perform_update, finalize_adios
 
-include("read.jl")
-include("setup.jl")
-include("utils.jl")
-include("visualize.jl")
-include("write.jl")
+let
+    global adios2_init, write_mode, read_mode, perform_update, finalize_adios,
+    adios, engine, var, init_state
+
+    include("read.jl")
+    include("setup.jl")
+    include("utils.jl")
+    include("visualize.jl")
+    include("write.jl")
+
+end
 
 end
