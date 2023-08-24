@@ -77,7 +77,7 @@ variable 'temperature' and provide its type
 
     end
 
-    function perform_read(...; read_function = nothing, verbose = true) # add defaults (allocation etc.) + verbose flag
+    function perform_read(a, ...; read_function = nothing, verbose = true) # add defaults (allocation etc.) + verbose flag
 
         nprocessed = 0
 
