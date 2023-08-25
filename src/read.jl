@@ -1,5 +1,7 @@
 using ADIOS2
 
+# compare documentation jl vs py
+
 """
 Sample usage:
 
