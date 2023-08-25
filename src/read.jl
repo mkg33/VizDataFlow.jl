@@ -47,7 +47,7 @@ variable 'temperature' and provide its type
     """
     Initialize io in read mode and the corresponding engine for reading data.
     """
-    function read_mode(bp_filename = "")
+    function read_mode(bp_filename = "") # read_config
 
         io = ADIOS2.declare_io(adios, "readerIO")
         bp_path = joinpath(pwd(), bp_filename)
@@ -58,17 +58,11 @@ variable 'temperature' and provide its type
     """
     Initialize io in write mode and the corresponding engine for writing data.
     """
-    function write_mode(variables... ; bp_filename = "") # other options
+    function write_mode(variables... ; bp_filename = "") # write_config
 
         # variable input: "temp", T, "temp1", T1, "temp2", T2 etc.
 
-        """
-        check if even:
-
-        if length(variables) % 2 != 0
-            print(error)
-        end
-        """
+        # create pairs and read them off
 
         io = ADIOS2.declare_io(adios, "IO")
 
@@ -77,13 +71,13 @@ variable 'temperature' and provide its type
             push!(vars, var_id)
         end
 
-        bp_path = joinpath(pwd(), bp_filename)
+        bp_path = joinpath(pwd(), bp_filename)          # check formats
         engine = ADIOS2.open(io, bp_path, mode_write)   # Open the file/stream from the .bp file
 
     end
 
     """
-    Perform the update using specified variables.
+    Perform the update using specified variables. Change name to write
     """
     function perform_update(update_var = nothing)
 
@@ -101,10 +95,10 @@ variable 'temperature' and provide its type
     end
 
     """
-
+    Reads the data sequentially. The user may also provide a custom function for handling the data.
     """
 
-    function perform_read(vars...; read_function = nothing, timeout = 100.0, verbose = true)
+    function perform_read(vars...; read_function = nothing, timeout = 100.0, verbose = true) # change name to read
 
         if verbose
             print("Total number of steps: " * string(steps(engine)))
@@ -125,7 +119,9 @@ variable 'temperature' and provide its type
                     global V   = zeros(var_type, nxy)                                        # Preallocate memory for the variable using the meta data
                 end
 
-                read_function
+                if !isnothing(read_function) # the user may handle the data with a custom function
+                    read_function
+                end
 
                 get(engine, var_id, V)
                 end_step(engine)
@@ -144,7 +140,7 @@ variable 'temperature' and provide its type
     end
 
     """
-    Provide details about all avaiable variables.
+    Provide details about all avaiable variables listed in the ADIOS2 file.
     """
 
     function inspect_variables(filename::AbstractString = "")
