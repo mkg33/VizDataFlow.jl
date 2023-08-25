@@ -39,7 +39,8 @@ variable 'temperature' and provide its type
             end
         end
 
-        init_state = true # mark the initialization step
+        init_state = true   # mark the initialization step
+        vars = []           # initialize the variable array (used later for reading and writing)
 
     end
 
@@ -57,10 +58,17 @@ variable 'temperature' and provide its type
     """
     Initialize io in write mode and the corresponding engine for writing data.
     """
-    function write_mode(variable_name = "", variable = nothing, bp_filename = "") # other options
+    function write_mode(variable_name = ""..., variable = nothing..., bp_filename = "") # other options
 
         io = ADIOS2.declare_io(adios, "IO")
-        var = define_variable(io, variable_name, eltype(variable))  # Define a new variable
+
+        for name in variable_name
+            for v in variable
+                var_id = define_variable(io, variable_name, eltype(variable))  # Define a new variable
+                put!(vars, var_id)
+            end
+        end
+
         bp_path = joinpath(pwd(), bp_filename)
         engine = ADIOS2.open(io, bp_path, mode_write)   # Open the file/stream from the .bp file
 
@@ -69,29 +77,50 @@ variable 'temperature' and provide its type
     """
     Perform the update using specified variables.
     """
-    function perform_update(T_nohalo = nothing) # add options
+    function perform_update(update_var = nothing)
+
+        for v in vars                                           # Locate the variable to be updated
+            if v == update_var
+                var = v
+                break
+            end
+        end
 
         begin_step(engine)                                       # Begin ADIOS2 write step
-        put!(engine, var, T_nohalo)                              # Add T (without halo) to variables for writing
+        put!(engine, var, update_var)                            # Add update_var to variables for writing
         end_step(engine)                                         # End ADIOS2 write step (normally, also includes the actual writing of data)
 
     end
 
-    function perform_read(a...; read_function = nothing, verbose = true) # add defaults (allocation etc.) + verbose flag
+    function perform_read(vars...; read_function = nothing, verbose = true)
 
-        nprocessed = 0
+        for var in vars
 
-        while begin_step(engine, step_mode_read, 100.0) != step_status_end_of_stream
+            nprocessed = 0
 
-            read_function
+            while begin_step(engine, step_mode_read, 100.0) != step_status_end_of_stream
 
-            end_step(engine)
+                var_id = inquire_variable(io, var)
 
-            if verbose
-                print("Step: " * string(nprocessed))
+                if nprocessed == 0
+                    nxy_global = shape(var_id)                                               # Extract meta data
+                    nxy        = count(var_id)                                               # ...
+                    var_type   = type(var_id)                                                # ...
+                    global V   = zeros(var_type, nxy)                                        # Preallocate memory for the variable using the meta data
+                end
+
+                read_function
+
+                get(engine, var_id, V)
+                end_step(engine)
+
+                if verbose
+                    print("Variable: " * string(var))
+                    print("Step: " * string(nprocessed))
+                end
+
+                nprocessed += 1
             end
-
-            nprocessed += 1
         end
 
     end
