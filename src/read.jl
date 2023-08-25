@@ -71,7 +71,7 @@ variable 'temperature' and provide its type
         io = ADIOS2.declare_io(adios, "IO")
 
         for i in 1:length(variables)
-            var_id = define_variable(io, variables[i], eltype(variables[i+1])  # Define a new variable
+            var_id = define_variable(io, variables[i], eltype(variables[i+1]))  # Define a new variable
             push!(vars, var_id)
         end
 
