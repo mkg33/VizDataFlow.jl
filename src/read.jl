@@ -58,15 +58,23 @@ variable 'temperature' and provide its type
     """
     Initialize io in write mode and the corresponding engine for writing data.
     """
-    function write_mode(variable_name = ""..., variable = nothing..., bp_filename = "") # other options
+    function write_mode(variables... ; bp_filename = "") # other options
+
+        # variable input: "temp", T, "temp1", T1, "temp2", T2 etc.
+
+        """
+        check if even:
+
+        if length(variables) % 2 != 0
+            print(error)
+        end
+        """
 
         io = ADIOS2.declare_io(adios, "IO")
 
-        for name in variable_name
-            for v in variable
-                var_id = define_variable(io, variable_name, eltype(variable))  # Define a new variable
-                push!(vars, var_id)
-            end
+        for i in 1:length(variables)
+            var_id = define_variable(io, variables(i), eltype(variables(i+1)))  # Define a new variable
+            push!(vars, var_id)
         end
 
         bp_path = joinpath(pwd(), bp_filename)
