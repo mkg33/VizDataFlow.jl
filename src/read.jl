@@ -60,7 +60,7 @@ variable 'temperature' and provide its type
     """
     function write_mode(variable_name = ""..., variable = nothing..., bp_filename = "") # other options
 
-        print(adios)
+        @isdefined(adios)
 
         io = ADIOS2.declare_io(adios, "IO")
 
