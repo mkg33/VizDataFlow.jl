@@ -19,6 +19,8 @@ variable 'temperature' and provide its type
 
         use_mpi = !isnothing(comm)
 
+        print(use_mpi)
+
         if isempty(filename)
             if serial
                 adios = adios_init_serial()
