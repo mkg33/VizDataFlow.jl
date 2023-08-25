@@ -39,6 +39,8 @@ variable 'temperature' and provide its type
             end
         end
 
+        print(adios)
+
         init_state = true   # mark the initialization step
         vars = []           # initialize the variable array (used later for reading and writing)
 
