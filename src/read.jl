@@ -34,7 +34,6 @@ variable 'temperature' and provide its type
         else
             if use_mpi
                 adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
-                print("HERE")
             else
                 adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
             end
@@ -66,7 +65,7 @@ variable 'temperature' and provide its type
         for name in variable_name
             for v in variable
                 var_id = define_variable(io, variable_name, eltype(variable))  # Define a new variable
-                put!(vars, var_id)
+                push!(vars, var_id)
             end
         end
 
