@@ -19,21 +19,23 @@ variable 'temperature' and provide its type
 
         use_mpi = !isnothing(comm)
 
+        adios = nothing # choose proper type
+
         if isempty(filename)
             if serial
-                adios = adios_init_serial()
+                global adios = adios_init_serial()
             elseif use_mpi
                 filename = adios2_config(engine = engine_type)
-                adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
+                global adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
             else serial_file
                 filename = adios2_config(engine = engine_type)
-                adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
+                global adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
             end
         else
             if use_mpi
-                adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
+                global adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
             else
-                adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
+                global adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
             end
         end
 
@@ -103,6 +105,9 @@ variable 'temperature' and provide its type
         if verbose
             print("Total number of steps: " * string(steps(engine)))
         end
+
+        # pairs
+        # allocate array
 
         for var in vars
 
