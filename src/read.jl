@@ -100,7 +100,15 @@ variable 'temperature' and provide its type
 
     end
 
+    """
+
+    """
+
     function perform_read(vars...; read_function = nothing, timeout = 100.0, verbose = true)
+
+        if verbose
+            print("Total number of steps: " * string(steps(engine)))
+        end
 
         for var in vars
 
@@ -125,12 +133,27 @@ variable 'temperature' and provide its type
                 if verbose
                     print("Variable: " * string(var))
                     print("Step: " * string(nprocessed))
+                    print("Variable steps: " * string(steps(var_iq)))
+                    print("Current step: " * string(current_step(engine)))
                 end
 
                 nprocessed += 1
             end
         end
 
+    end
+
+    """
+    Provide details about all avaiable variables.
+    """
+
+    function inspect_variables(filename::AbstractString = "")
+        if !isempty(filename)
+            var_info = adios_all_variable_names(filename)
+            print(var_info)
+        else
+            print("error")
+        end
     end
 
     """
