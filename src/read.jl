@@ -22,12 +22,10 @@ variable 'temperature' and provide its type
         if isempty(filename)
             if serial
                 adios = adios_init_serial()
-                # some function
             elseif use_mpi
                 filename = adios2_config(engine = engine_type)
                 adios = ADIOS2.adios_init_mpi(joinpath(pwd(), filename), comm)
-                # add error
-            else serial_file # third option
+            else serial_file
                 filename = adios2_config(engine = engine_type)
                 adios = ADIOS2.adios_init_serial(joinpath(pwd(), filename))
             end
@@ -41,6 +39,8 @@ variable 'temperature' and provide its type
 
         init_state = true   # mark the initialization step
         vars = []           # initialize the variable array (used later for reading and writing)
+
+        print(@isdefined(adios))
 
     end
 
@@ -59,8 +59,6 @@ variable 'temperature' and provide its type
     Initialize io in write mode and the corresponding engine for writing data.
     """
     function write_mode(variable_name = ""..., variable = nothing..., bp_filename = "") # other options
-
-        print(adios)
 
         io = ADIOS2.declare_io(adios, "IO")
 
