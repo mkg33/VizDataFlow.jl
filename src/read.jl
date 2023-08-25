@@ -100,13 +100,13 @@ variable 'temperature' and provide its type
 
     end
 
-    function perform_read(vars...; read_function = nothing, verbose = true)
+    function perform_read(vars...; read_function = nothing, timeout = 100.0, verbose = true)
 
         for var in vars
 
             nprocessed = 0
 
-            while begin_step(engine, step_mode_read, 100.0) != step_status_end_of_stream
+            while begin_step(engine, step_mode_read, timeout) != step_status_end_of_stream
 
                 var_id = inquire_variable(io, var)
 
