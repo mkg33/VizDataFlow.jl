@@ -39,8 +39,6 @@ variable 'temperature' and provide its type
             end
         end
 
-        print(adios)
-
         init_state = true   # mark the initialization step
         vars = []           # initialize the variable array (used later for reading and writing)
 
@@ -61,6 +59,8 @@ variable 'temperature' and provide its type
     Initialize io in write mode and the corresponding engine for writing data.
     """
     function write_mode(variable_name = ""..., variable = nothing..., bp_filename = "") # other options
+
+        print(adios)
 
         io = ADIOS2.declare_io(adios, "IO")
 
