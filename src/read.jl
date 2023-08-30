@@ -41,7 +41,7 @@ variable 'temperature' and provide its type
             end
         end
 
-        init_state = true          # mark the initialization step
+        global init_state = true          # mark the initialization step
         global vars = []           # initialize the variable array (used later for reading and writing)
 
         # print(@isdefined(adios))
