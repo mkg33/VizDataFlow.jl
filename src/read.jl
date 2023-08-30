@@ -44,7 +44,7 @@ variable 'temperature' and provide its type
         init_state = true          # mark the initialization step
         global vars = []           # initialize the variable array (used later for reading and writing)
 
-        print(@isdefined(adios))
+        # print(@isdefined(adios))
 
     end
 
@@ -62,7 +62,7 @@ variable 'temperature' and provide its type
     """
     Initialize io in write mode and the corresponding engine for writing data.
     """
-    function write_mode(variables... ; bp_filename = "") # write_config
+    function write_mode(p = var_name => var ...; bp_filename = "") # write_config
 
         # variable input: "temp", T, "temp1", T1, "temp2", T2 etc.
 
@@ -70,8 +70,8 @@ variable 'temperature' and provide its type
 
         io = ADIOS2.declare_io(adios, "IO")
 
-        for i in 1:length(variables)
-            var_id = define_variable(io, variables[i], eltype(variables[i+1]))  # Define a new variable
+        for var_pair in p
+            var_id = define_variable(io, var_name.first, eltype(var_name.second))  # Define a new variable
             push!(vars, var_id)
         end
 
