@@ -95,7 +95,7 @@ variable 'temperature' and provide its type
         end
 
         begin_step(engine)                                       # Begin ADIOS2 write step
-        put!(engine, update_var, vars[1])                            # Add update_var to variables for writing
+        put!(engine, vars[1], update_var)                            # Add update_var to variables for writing
         end_step(engine)                                         # End ADIOS2 write step (normally, also includes the actual writing of data)
 
     end
