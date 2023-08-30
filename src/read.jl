@@ -62,7 +62,7 @@ variable 'temperature' and provide its type
     """
     Initialize io in write mode and the corresponding engine for writing data.
     """
-    function write_mode(p = var_name => var ...; bp_filename = "") # write_config
+    function write_mode(variables ...; bp_filename = "") # write_config
 
         # variable input: "temp", T, "temp1", T1, "temp2", T2 etc.
 
@@ -70,7 +70,7 @@ variable 'temperature' and provide its type
 
         io = ADIOS2.declare_io(adios, "IO")
 
-        for var_pair in p
+        for var_pair in variables
             var_id = define_variable(io, var_pair.first, eltype(var_pair.second))  # Define a new variable
             push!(vars, var_id)
         end
