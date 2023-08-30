@@ -76,7 +76,7 @@ variable 'temperature' and provide its type
         end
 
         bp_path = joinpath(pwd(), bp_filename)          # check formats
-        engine = ADIOS2.open(io, bp_path, mode_write)   # Open the file/stream from the .bp file
+        global engine = ADIOS2.open(io, bp_path, mode_write)   # Open the file/stream from the .bp file
 
     end
 
