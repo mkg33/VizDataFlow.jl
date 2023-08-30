@@ -85,6 +85,8 @@ variable 'temperature' and provide its type
     """
     function perform_update(update_var = nothing)
 
+        var = nothing
+
         for v in vars                                           # Locate the variable to be updated
             if v == update_var
                 var = v
