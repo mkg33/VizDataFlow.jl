@@ -91,6 +91,8 @@ using ADIOS2
             global reading_now = false
             global nprocessed = 0
             return false
+        end
+        
     end
 
     """
